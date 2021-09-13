@@ -40,6 +40,7 @@ For more information please visit:  http://bitmagic.io
 #include <random>
 #include <algorithm>
 #include <stdexcept>
+#include <cassert>
 
 #include "bm.h"
 #include "bmsparsevec.h"
