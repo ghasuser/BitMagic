@@ -23,10 +23,10 @@ env:
   
   # CODEQL LANGUAGE AND QUERIES 
   # The CodeQL CLI only supports one language to analyse
-  CODEQL_LANGUAGE: java
+  CODEQL_LANGUAGE: cpp
   # ..codeql-suites/ has multiple suites. The built-in queries is called <language>-code-scanning.qls
-  # https://github.com/github/codeql/tree/main/java/ql/src/codeql-suites
-  CODEQL_QUERIES: /home/runner/work/codeql-home/codeql/qlpacks/codeql-java/codeql-suites/java-security-and-quality.qls
+  # https://github.com/github/codeql/tree/main/cpp/ql/src/codeql-suites
+  CODEQL_QUERIES: /home/runner/work/codeql-home/codeql/qlpacks/codeql-cpp/codeql-suites/cpp-security-and-quality.qls
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
