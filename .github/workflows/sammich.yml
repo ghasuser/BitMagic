@@ -62,9 +62,9 @@ jobs:
       - name: Sammich model
         run: |
           ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --trace-process-level 3 --source-root . --begin-tracing ${{ env.CODEQL_DATABASE }}
-          source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
-          
+
           source ./bmenv.sh
+          source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
           make rebuild
 
           ${{ env.CODEQL_BINARY }} database finalize ${{ env.CODEQL_DATABASE }}
