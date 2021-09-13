@@ -56,7 +56,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Sammich init
         run: |
-          ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --trace-process-level 3 --source-root . --begin-tracing ${{ env.CODEQL_DATABASE }}
+          ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --source-root . --begin-tracing ${{ env.CODEQL_DATABASE }}
 
       - name: Sammich source env
         run: |
