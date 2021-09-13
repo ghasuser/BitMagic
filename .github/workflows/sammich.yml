@@ -1,0 +1,78 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Sammich
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  WORKSPACE: /home/runner/work 
+  # GITHUB_WORKPACE is /home/runner/work/repo-name/repo-name if using the Checkout action
+  # https://docs.github.com/en/actions/reference/environment-variables
+  # The purpose of defining WORKSPACE is so that the codeql-home, codeql-database, codeql-sarif-results directories are on the same level
+  
+  # CODEQL DIRECTORIES, FILES
+  CODEQL_HOME: /home/runner/work/codeql-home
+  CODEQL_BINARY: /home/runner/work/codeql-home/codeql/codeql
+  CODEQL_DATABASE: /home/runner/work/codeql-database
+  CODEQL_SARIF: /home/runner/work/codeql-sarif-results
+  CODEQL_SARIF_FILE: /home/runner/work/codeql-sarif-results/code-scanning-alerts.sarif
+  
+  # CODEQL LANGUAGE AND QUERIES 
+  # The CodeQL CLI only supports one language to analyse
+  CODEQL_LANGUAGE: java
+  # ..codeql-suites/ has multiple suites. The built-in queries is called <language>-code-scanning.qls
+  # https://github.com/github/codeql/tree/main/java/ql/src/codeql-suites
+  CODEQL_QUERIES: /home/runner/work/codeql-home/codeql/qlpacks/codeql-java/codeql-suites/java-security-and-quality.qls
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Setup Required Directories and Files
+        run: |
+          cd ${{ env.WORKSPACE }}
+          mkdir ${{ env.CODEQL_HOME }}
+          mkdir ${{ env.CODEQL_SARIF }}
+          touch ${{ env.CODEQL_SARIF_FILE }}
+    
+      - name: Download CodeQL Bundle
+        run: |
+          cd ${{ env.CODEQL_HOME }}
+          wget -q https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
+          tar xzf ./codeql-bundle-linux64.tar.gz
+
+      # Runs a set of commands using the runners shell
+      - name: Sammich model
+        run: |
+          ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --trace-process-level 3 --source-root . --begin-tracing ${{ env.CODEQL_DATABASE }}
+          source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
+          
+          source ./bmenv.sh
+          make rebuild
+
+          ${{ env.CODEQL_BINARY }} database finalize ${{ env.CODEQL_DATABASE }}
+          
+      - name: Perform CodeQL Analysis
+        run: |
+          ${{ env.CODEQL_BINARY }} database analyze ${{ env.CODEQL_DATABASE }} ${{ env.CODEQL_QUERIES }} --format=sarif-latest --output=${{ env.CODEQL_SARIF_FILE }}
+
+      - name: Upload CodeQL SARIF Results
+        run: |
+          ${{ env.CODEQL_BINARY }} github upload-results --repository=$GITHUB_REPOSITORY --ref=$GITHUB_REF --commit=$GITHUB_SHA --sarif=${{ env.CODEQL_SARIF_FILE }} --github-auth-stdin=${{ secrets.GITHUB_TOKEN }}
