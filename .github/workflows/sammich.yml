@@ -10,10 +10,7 @@ on:
 
 env:
   WORKSPACE: /home/runner/work 
-  # GITHUB_WORKPACE is /home/runner/work/repo-name/repo-name if using the Checkout action
-  # https://docs.github.com/en/actions/reference/environment-variables
-  # The purpose of defining WORKSPACE is so that the codeql-home, codeql-database, codeql-sarif-results directories are on the same level
-  
+
   # CODEQL DIRECTORIES, FILES
   CODEQL_HOME: /home/runner/work/codeql-home
   CODEQL_BINARY: /home/runner/work/codeql-home/codeql/codeql
@@ -24,20 +21,13 @@ env:
   # CODEQL LANGUAGE AND QUERIES 
   # The CodeQL CLI only supports one language to analyse
   CODEQL_LANGUAGE: cpp
-  # ..codeql-suites/ has multiple suites. The built-in queries is called <language>-code-scanning.qls
-  # https://github.com/github/codeql/tree/main/cpp/ql/src/codeql-suites
   CODEQL_QUERIES: /home/runner/work/codeql-home/codeql/qlpacks/codeql-cpp/codeql-suites/cpp-security-and-quality.qls
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
       - name: Setup Required Directories and Files
@@ -97,4 +87,3 @@ jobs:
         with:
           name: ${{ env.CODEQL_LANGUAGE }}-db
           path: ${{ steps.codeql-database-bundle.outputs.zip }}
-
