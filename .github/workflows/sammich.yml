@@ -54,22 +54,16 @@ jobs:
           tar xzf ./codeql-bundle-linux64.tar.gz
 
       # Runs a set of commands using the runners shell
-      - name: Sammich init
+      - name: Sammich model
         run: |
           ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --source-root . --begin-tracing ${{ env.CODEQL_DATABASE }}
 
-      - name: Sammich source env
-        run: |
           source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
         
-      - name: Sammich build
-        run: |
           source ./bmenv.sh
           env
           make rebuild
 
-      - name: Sammich finalize
-        run: |
           ${{ env.CODEQL_BINARY }} database finalize ${{ env.CODEQL_DATABASE }}
           
       - name: Perform CodeQL Analysis
