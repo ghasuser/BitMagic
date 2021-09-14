@@ -65,6 +65,7 @@ jobs:
       - name: Sammich build
         run: |
           source ./bmenv.sh
+          env
           make rebuild
 
       - name: Sammich finalize
