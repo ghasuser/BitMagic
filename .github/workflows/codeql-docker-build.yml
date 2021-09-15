@@ -1,0 +1,83 @@
+name: CodeQL + Docker build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+env:
+  WORKSPACE: /home/runner/work 
+
+  # CODEQL DIRECTORIES, FILES
+  CODEQL_HOME: /home/runner/work/codeql-home
+  CODEQL_BINARY: /home/runner/work/codeql-home/codeql/codeql
+  CODEQL_DATABASE: /home/runner/work/codeql-database
+  CODEQL_SARIF: /home/runner/work/codeql-sarif-results
+  CODEQL_SARIF_FILE: /home/runner/work/codeql-sarif-results/code-scanning-alerts.sarif
+  
+  # CODEQL LANGUAGE AND QUERIES 
+  # The CodeQL CLI only supports one language to analyse
+  CODEQL_LANGUAGE: cpp
+  CODEQL_QUERIES: /home/runner/work/codeql-home/codeql/qlpacks/codeql-cpp/codeql-suites/cpp-security-and-quality.qls
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Required Directories and Files
+        run: |
+          cd ${{ env.WORKSPACE }}
+          mkdir ${{ env.CODEQL_HOME }}
+          mkdir ${{ env.CODEQL_SARIF }}
+          touch ${{ env.CODEQL_SARIF_FILE }}
+    
+      - name: Download CodeQL Bundle
+        run: |
+          cd ${{ env.CODEQL_HOME }}
+          wget -q https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz
+          tar xzf ./codeql-bundle-linux64.tar.gz
+      - name: Sammich model
+        run: |
+          # init
+          ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --source-root . --begin-tracing ${{ env.CODEQL_DATABASE }}
+          
+          # source envs
+          source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
+          env
+          
+          # build
+          docker build . --file Dockerfile --build-arg LD_PRELOAD=$LD_PRELOAD
+          
+          # finalize
+          ${{ env.CODEQL_BINARY }} database finalize ${{ env.CODEQL_DATABASE }}
+          
+      - name: Perform CodeQL Analysis
+        run: |
+          ${{ env.CODEQL_BINARY }} database analyze ${{ env.CODEQL_DATABASE }} ${{ env.CODEQL_QUERIES }} --format=sarif-latest --output=${{ env.CODEQL_SARIF_FILE }}
+      - name: Upload CodeQL SARIF Results
+        run: |
+          ${{ env.CODEQL_BINARY }} github upload-results --repository=$GITHUB_REPOSITORY --ref=$GITHUB_REF --commit=$GITHUB_SHA --sarif=${{ env.CODEQL_SARIF_FILE }} --github-auth-stdin=${{ secrets.GITHUB_TOKEN }}
+      - name: Zip CodeQL database
+        if: ${{ always() }}
+        id: codeql-database-bundle
+        env:
+          LANGUAGE: ${{ env.CODEQL_LANGUAGE }}
+        run: |
+          set -xu
+          CODEQL_DATABASE="${{ env.CODEQL_DATABASE }}"
+          CODEQL_DATABASE_ZIP="codeql-database-$LANGUAGE.zip"
+          zip -r "$CODEQL_DATABASE_ZIP" "$CODEQL_DATABASE"
+          echo "::set-output name=zip::$CODEQL_DATABASE_ZIP"
+      - name: Upload CodeQL database
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CODEQL_LANGUAGE }}-db
+          path: ${{ steps.codeql-database-bundle.outputs.zip }}
+  
