@@ -48,7 +48,7 @@ jobs:
           ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --source-root . --begin-tracing codeql-db
           
           # source envs
-          source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
+          source codeql-db/temp/tracingEnvironment/start-tracing.sh
           env
           
           # build
