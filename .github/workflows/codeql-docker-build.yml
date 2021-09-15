@@ -49,6 +49,9 @@ jobs:
           
           # source envs
           source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
+          echo "start tracing envs"
+          cat ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
+          echo "all envs below:
           env
           
           # build
