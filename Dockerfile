@@ -2,5 +2,4 @@ FROM gcc:latest
 
 COPY . .
 
-RUN . ./bmenv.sh
-RUN make rebuild
+RUN . ./bmenv.sh && make rebuild
