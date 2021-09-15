@@ -45,7 +45,7 @@ jobs:
       - name: Sammich model
         run: |
           # init
-          ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --source-root . --begin-tracing ${{ env.CODEQL_DATABASE }}
+          ${{ env.CODEQL_BINARY }} database init --language ${{ env.CODEQL_LANGUAGE }} --source-root . --begin-tracing codeql-db
           
           # source envs
           source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
@@ -66,8 +66,8 @@ jobs:
             --build-arg CODEQL_EXTRACTOR_CPP_TRAP_DIR=$CODEQL_EXTRACTOR_CPP_TRAP_DIR \
             --build-arg CODEQL_EXTRACTOR_CPP_SOURCE_ARCHIVE_DIR=$CODEQL_EXTRACTOR_CPP_SOURCE_ARCHIVE_DIR \
             --build-arg LD_PRELOAD=$LD_PRELOAD
-            --target=${{ env.CODEQL_DATABASE }}
-            --output ${{ env.CODEQL_DATABASE }}/new
+            --target=codeql-db
+            --output codeql-db/new
           
           # is this even possible
           cd ${{ env.CODEQL_DATABASE }}/new
