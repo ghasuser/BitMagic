@@ -49,13 +49,23 @@ jobs:
           
           # source envs
           source ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
-          echo "start tracing envs"
-          cat ${{ env.CODEQL_DATABASE }}/temp/tracingEnvironment/start-tracing.sh
-          echo "all envs below:
           env
           
           # build
-          docker build . --file Dockerfile --build-arg LD_PRELOAD=$LD_PRELOAD
+          docker build . --file Dockerfile \
+            --build-arg ODASA_TRACER_CONFIGURATION=$ODASA_TRACER_CONFIGURATION \
+            --build-arg CODEQL_SCRATCH_DIR=$CODEQL_SCRATCH_DIR \
+            --build-arg CODEQL_DIST=$CODEQL_DIST \
+            --build-arg CODEQL_PLATFORM=$CODEQL_PLATFORM \
+            --build-arg CODEQL_PLATFORM_DLL_EXTENSION=$CODEQL_PLATFORM_DLL_EXTENSION \
+            --build-arg CODEQL_JAVA_HOME=$CODEQL_JAVA_HOME \
+            --build-arg CODEQL_EXTRACTOR_CPP_ROOT=$CODEQL_EXTRACTOR_CPP_ROOT \
+            --build-arg CODEQL_EXTRACTOR_CPP_WIP_DATABASE=$CODEQL_EXTRACTOR_CPP_WIP_DATABASE \
+            --build-arg CODEQL_EXTRACTOR_CPP_LOG_DIR=$CODEQL_EXTRACTOR_CPP_LOG_DIR \
+            --build-arg CODEQL_EXTRACTOR_CPP_SCRATCH_DIR=$CODEQL_EXTRACTOR_CPP_SCRATCH_DIR \
+            --build-arg CODEQL_EXTRACTOR_CPP_TRAP_DIR=$CODEQL_EXTRACTOR_CPP_TRAP_DIR \
+            --build-arg CODEQL_EXTRACTOR_CPP_SOURCE_ARCHIVE_DIR=$CODEQL_EXTRACTOR_CPP_SOURCE_ARCHIVE_DIR \
+            --build-arg LD_PRELOAD=$LD_PRELOAD
           
           # finalize
           ${{ env.CODEQL_BINARY }} database finalize ${{ env.CODEQL_DATABASE }}
