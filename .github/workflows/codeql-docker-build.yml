@@ -66,6 +66,13 @@ jobs:
             --build-arg CODEQL_EXTRACTOR_CPP_TRAP_DIR=$CODEQL_EXTRACTOR_CPP_TRAP_DIR \
             --build-arg CODEQL_EXTRACTOR_CPP_SOURCE_ARCHIVE_DIR=$CODEQL_EXTRACTOR_CPP_SOURCE_ARCHIVE_DIR \
             --build-arg LD_PRELOAD=$LD_PRELOAD
+            --target=${{ env.CODEQL_DATABASE }}
+            --output ${{ env.CODEQL_DATABASE }}/new
+          
+          # is this even possible
+          cd ${{ env.CODEQL_DATABASE }}/new
+          ls -l
+          cd $GITHUB_WORKSPACE
           
           # finalize
           ${{ env.CODEQL_BINARY }} database finalize ${{ env.CODEQL_DATABASE }}
