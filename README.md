@@ -1,4 +1,4 @@
-## BitMagic C++ Library
+## BitMagic C++ Library + testing
 
 BitMagic was created as a Algebra of Sets toolkit for Information Retrieval but currently evolved into a more general Data Science components library for memory compact structures and algorithms on succinct data vectors. 
 BitMagic implements compressed bit-vectors and containers (vectors) based on ideas of bit-slicing transform
