@@ -136,7 +136,7 @@ Succint vectors are labeled "sparse" but they also work for dense vectors.
 Bit transposition solves two purposes: free unused bit plains and isolate regularity and entropy into
 separate (sparse) bit-vectors. Compression on bit-planes offers both superior memory performance and fast search. One of the design golas was to be able to perform searches on succinct data using vectorized
 logical operations.
-
+lol
 Succinct bit-transposed implementation works well for both integer vectors and string vectors and 
 it rivals other succinct schemes like prefix trees. Succinct vectors can be both sorted and unsorted.
 The idea here is similar to Apache Arrow-Parquet, but it takes it farther with bit-plane compression 
